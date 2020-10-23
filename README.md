@@ -1,24 +1,9 @@
-# d3-practice
+# d3를 Vue에 붙여봅니다
 
-## Project setup
-```
-yarn install
-```
+## 막대그래프
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+## 뒤집힌?막대그래프
 
-### Compiles and minifies for production
-```
-yarn build
-```
+## 꺾은선 + 막대 그래프
 
-### Lints and fixes files
-```
-yarn lint
-```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
