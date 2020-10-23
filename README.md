@@ -1,46 +1,38 @@
-# d3.js
+# 예제로 익혀서 Vue에 써먹는 d3.js
 
-뭐가 있는지 감만 좀 잡는 정리
+진짜 js 생태계에서 공부하기 어려운 기술 1등아닐까,,,  
+자료도 없고 동작방식도 난해함  
 
 ## d3의 정신
 
-## 기반기술 - SVG
+## 예제들
 
-확장 가능한 벡터 그래픽 - 2차원 그래픽을 표현하기 위해 만들어진 XML 파일 형식의 마크업 언어 벡터는 기본적인 도형, 패스 등 일러스트에서 작업하는 모든 것. **SVG는 코드로 수정할 수 있기 때문에 다른 이미지 형식보다 강력**
-
-- x, y: 좌표
-- width, height
-- 도형) rect, circle, ellipse, line, polyline, polygon, path
-- cx:원의 중심 중 x값, cy:원의 중심 중 y값, r:원의 반지름
-- [svg 기본 도형 attribute](https://developer.mozilla.org/ko/docs/Web/SVG/Tutorial/%EA%B8%B0%EB%B3%B8_%EB%8F%84%ED%98%95)
-
-### coordinate
-
-![좌표찍어라](https://alexwlchan.net/images/2019/cartesian_coordinates.svg)
-
-왼쪽 맨 끝점이 origin, translate가 그 지점을 기준으로 진행됨
+### 1. select : 변화의 시작점
 
 ```js
-var svg = d3.select("body").append("svg")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight);
+var dataset = [ 5, 10, 15, 20, 25 ];
 
-var g = svg.append("g")
-    .attr("transform", "translate("
-      + marginLeft + ","
-      + marginTop + ")");
+d3.select("body")          // 1 바디부터 먼저 선택 => obj
+  .selectAll("p")          // 2 그 아래 p 요소 전부선택 => obj
+  .data(dataset)           // 3 data를 선택한 selection 객체에 바인딩(빈 selection에 바인딩)
+  .enter()                 // 4 대응하는 p요소가 없는 데이터에 대해 새로운 selection 반환 => obj
+  .append("p")             // 5 만들어져 선택된 요소들에 대해 실제 요소 생성 => 실제요소 만듬
+  .text("New paragraph!"); // 6 텍스트 넣는다 => 내용넣음
 ```
 
-### fundamental shapes
+- 조작하고자 하는 요소를 선택한다. => 이 요소는 **처음에 존재하지 않을 수도 있다**
+- 선택이 있든 없든간에 이 객체를 시작으로 다음 작업들이 실행된다
+- selection 객체에 대해서 data()를 통해 특정 데이터를 바인드하고
+- enter()과 exit을 통해 데이터에 대응하는 객체를 다룰 수 있는 기능을 제공
+- enter는 selection에 바인드된 데이터 중에 아직 실제 문서 요소를 가지지 못하는 것들을 찾아내서 **가상의 객체**로 만들어 반환한다. 옵젝을 까보면 각각의 data요소들이 __data__이런식으로 바인딩되어이씀
+- append는 selection obj를 바탕으로 이를 **실제요소**로 바꿔준다
 
-- rect : x, y, widht, height, rx, ry
-- circle : cx, cy, r
-- line : x1, x2, y1, y2 ...
-- d3.svg.line, d3.svg.area
+#### enter vs select
 
-## d3 API
+- enter : 바인드된 데이터 중에서 아직 실제 문서 요소를 가지지 못하는 것들**만** 찾아내서 가상의 객체로 만들어서 반환. 이미 요소가 존재할 경우에는 selectAll 같은 경우는 빈 selection이 아니라 이미 존재하는 요소가 선택된 상태가 됨. enter단에서 미리 존재하는 요소들은 무시됨
+- 요소가 만들어진 이후에 문서 요소를 조작하기 위해서는 data만 조작하면 된다. => 문서 요소에 따라 다르게
 
-### setAttribute
+### 2. setAttribute : 직접 svg를 조작한다.
 
 d3 api에 elem에 직접 접근해서 modify
 
@@ -59,11 +51,9 @@ d3.selectAll("circle")
 - style : svg style 설정
 - append: selectAll같은 elem[]에다가 추가
 
-### enter, update, exit
+### 3. enter, update, exit : d3의 가장 특징적인 개념
 
 ![???뭐야이게](https://lumiamitie.github.io/images/post_image/d3_enter_update_exit/d3_enter_update_exit01.PNG)
-
-join처럼 생각하기
 
 ```js
 d3.select('svg')
@@ -159,7 +149,7 @@ var x = d3.scale.log()
 scale을 넘겨주면 알아서 그려줌 => 축을 그리는 기준을 제공  
 
 ```js
-const resizer = ()_=>{
+const resizer = ()_=> {
   const h = document.getElementById('graph').offsetHeight;
   const yscale = d3.scaleLinear()
     .domain([0, 4955]) //실제값의 범위
@@ -168,6 +158,7 @@ const resizer = ()_=>{
     .attr('transform', 'translate(50, 0)') //살짝 오른쪽으로 밀고
     .call(d3.axisLeft(yscale)); //축함수를 넘기면 알아서 그려줌.
 };
+
 window.addEventListener('resize', resizer);
 resizer();
 ```
@@ -184,3 +175,10 @@ x.ticks(5); // [12, 14, 16, 18, 20, 22, 24]
 
 분절점, scale domain값 사이 적절하게 나눠서 ticks 인자만큼의 값을 집어넣는다  
 축만들때 위치 나누기 좋음
+
+### call
+
+
+## reference
+
+- https://www.44bits.io/ko/post/d3js-basic-understanding-select-and-enter-api
