@@ -1,16 +1,26 @@
 <template>
   <div id="app">
-    그래프 ㄱ
+    <BarChart/>
   </div>
 </template>
 
 <script>
+import LineChart from './components/LineChart'
 
 export default {
   name: 'App',
+  components: {
+    LineChart
+  }
 }
 </script>
 
-<style>
+<style scoped>
+
+#app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 </style>
