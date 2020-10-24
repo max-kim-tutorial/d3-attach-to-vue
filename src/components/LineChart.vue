@@ -94,7 +94,8 @@ export default {
       .attr('fill', 'green')
       .selectAll('rect')
       .data(dataSet)
-    
+    console.log(rects)
+    console.log(rects.enter()._groups)
     //! 축 붙이기
     svg.append('g').call(this.getXaxis());
     svg.append('g').call(this.getYaxis());
