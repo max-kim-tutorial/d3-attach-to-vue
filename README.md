@@ -71,7 +71,7 @@ d3.select('svg')
 - exit: 이미 그려졌는데 data에는 없는 것들=> 주로 삭제를 하게됨
 - enter => update => exit
 
-### data bind
+### 4. data bind
 
 ```js
 svg.selectAll("circle")
@@ -115,9 +115,9 @@ function drawbar(bardata) {
 }
 ```
 
-### scales
+### 5. scales
 
-척도. scale은 어떤 범위의 숫자를 다른 범위의 숫자로 변경해주는 함수. 숫자의 확장. 도메인을 지정하면 range의 범위로 => 선형변환, 일종의 일대일함수를 반환한다고 생각하면 될듯yo
+**데이터의 척도이자 범위를 함수로 표현한 것, 축척** scale은 어떤 범위의 숫자를 다른 범위의 숫자로 변경해주는 함수. 숫자의 확장. 도메인을 지정하면 range의 범위로 => 선형변환, 일종의 일대일함수를 반환한다고 생각하면 될듯yo
 
 ```js
 // 정의역 지정 => 치역range지정 => 함수
@@ -140,13 +140,26 @@ var x = d3.scale.log()
   - scaleDate : 날짜를 분절 정의역으로 사용
   - scaleOrdinal : range와 domain을 일대일 매핑
 - domain : 정의역의 실질적인 범위, derives from data(d3.max, d3.min, extent의 api로 데이터에서 추출)
-- range : 치역(반환값)의 범위
+- nice : 정의역을 깔끔한 반올림 값으로 시작하고 끝나도록 확장한다. 이 메서드는 스케일의 정의역을 수정해서 가장 근접한 반올림 값으로 정의역의 경계를 확장한다.
+- range : 치역(반환값)의 범위, domain으로 넘긴 값에 대응되서 값이 나오도록 한다. 최종 반환값은 함수 => 이때 픽셀값, margin을 고려해서 값이 나오도록 한다. 차트의 좌표값으로 표현될 것이기 때무네
 - interpolate : 보간, 정의역에 대응하는 뭔가 치역을 갖다 붙이는 행위
 
-### axis
+#### 도메인 구하기 위해 사용할 수 있는 메소드
 
-차트에서 축은 너무나 자주 사용되서 축을 생성하는 기능이 있음  
-scale을 넘겨주면 알아서 그려줌 => 축을 그리는 기준을 제공  
+- extent : 배열에서 최대 최소값을 찾는다
+- max : 배열에서 최대값을 찾는다
+- min : 배열에서 최소값을 찾는다
+
+### 6. axis
+
+- 차트에서 축은 너무나 자주 사용되서 축을 생성하는 기능이 있음 scale을 넘겨주면 알아서 그려줌 => 축을 그리는 기준(척도)을 제공  
+- 2차원 차트의 축은 상하좌우
+  - d3.axisTop(scale)
+  - d3.axisBottom(scale)
+  - d3.axisLeft(scale)
+  - d3.axisRight(scale)
+- 축함수는 range의 값을 **픽셀 크기**로 인식하여 그린다.
+- translate로 움직여줘야 내가 바라는 곳에 위치할 가능성이 높다.
 
 ```js
 const resizer = ()_=> {
@@ -163,7 +176,7 @@ window.addEventListener('resize', resizer);
 resizer();
 ```
 
-### ticks
+### 7. ticks
 
 ```js
 var x = d3.scale.linear()
@@ -173,8 +186,9 @@ var x = d3.scale.linear()
 x.ticks(5); // [12, 14, 16, 18, 20, 22, 24]
 ```
 
-분절점, scale domain값 사이 적절하게 나눠서 ticks 인자만큼의 값을 집어넣는다  
-축만들때 위치 나누기 좋음
+- 분절점, scale domain값 사이 적절하게 나눠서 ticks 인자만큼의 값을 집어넣는다  
+- ticks : 해당 스케일의 입력 정의역에서 대략 count수 만큼의 대표값들을 반환. 
+- tickFormat : 출력용 구분자 값으로 사용할 적절한 number format을 반환. count는 구분값을 생성하기 위해 사용되는 count와 같은 값을 사용함. 스케일 내장 구분자 포매터.
 
 ### call
 
