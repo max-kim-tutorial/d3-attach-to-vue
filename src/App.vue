@@ -1,17 +1,18 @@
 <template>
   <div id="app">
-    <LineChart :data-set="dataSet"/>
     <button @click="modifyData">modify dataset in parent</button>
+    <BarChart :data-set="linearDataSet"/>
   </div>
 </template>
 
 <script>
-import LineChart from './components/LineChart'
+// import LineChart from './components/LineChart'
+import BarChart from './components/BarChart'
 
 export default {
   name: 'App',
   components: {
-    LineChart
+    BarChart
   },
   data:() => ({
     dataSet: [
@@ -22,6 +23,7 @@ export default {
       {name: 'e', value: 23},
       {name: 'f', value: 15}
     ],
+    linearDataSet : [32,17,57,29,54,23,52]
   }),
   methods:{
     modifyData() {
@@ -34,17 +36,14 @@ export default {
         {name: 'f', value: 51},
         {name: 'g', value: 71},
       ]
+      this.linearDataSet = [22, 33, 15, 23, 52, 24, 34]
     }
   }
 }
 </script>
 
 <style scoped>
-
-#app {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
+ #app {
+   text-align: center;
+ }
 </style>
