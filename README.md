@@ -313,7 +313,44 @@ d3.selectAll("circle")
 
 - 이미 있다고 생각하고 + 데이터셋이 바뀌면 어떤 속성이 따라 바뀌냐 == 이걸로 update를 해줄 수 있게 로직을 짜면 될거같다
 
-### 9. transition/motion: 효과 주기
+#### 축 갱신
+
+```js
+  svg.select('.yAxis')
+    .transition()
+    .duration(1000)
+    .call(this.getAxis())
+```
+
+- 축도 call을 통해 축 생성자 함수를 부르는 식으로 갱신이 가능하다.
+
+#### length가 유지되지 않는 갱신
+
+
+
+### 9. transition/motion: 갱신시 효과 주기
+
+- 갱신될때마다 트랜지션을 줄 수가 있다. 
+- 갱신 dataBinding 다음에 바로 transition을 넣어주면 된다
+
+```js
+ svg.selectAll('rect')
+    .data(dataSet)
+    .transition()
+    .attr("x", (d,i) => xScale(i))
+    .attr("y", (d) => height - (d*2))
+    .attr("height", d => yScale(d))
+    .attr('fill', 'blue')
+```
+
+- transition을 추가하면 d3는 새로운 값을 즉각 반영하지 않고 시간 개념을 도입한다. 시작과 끝 값을 정규화하고 중간 상태의 모든 값을 계산한다.
+
+#### 트랜지션 관련 메서드
+
+- duration : attr의 적용까지 걸리는 시간은 250밀리초 정도인데, 트랜지션의 지속 시간을 제어할 수 있다. 실제 지속 시간이 그대로 반영되지는 않음. 어떤 svg냐에 따라 양상이 달라짐
+- ease: cubic-in-out이 디폴트로 되어있음. linear, cicle, elastic, bounce 등이 있다.
+- delay : 트랜지션의 시작 시점을 지정한다. duration보다 앞서있는게 좋다. 동적인 지연값을 주면 시차 지연을 두면서 시각화 요소들이 서로 다른 타이밍에 트랜지션이 될 수 있을 것이다. 인자로 함수를 넘길 수 있다 `(d,i) =>`
+- each : 트랜지션이 시작하거나 끝나는 시점에 무언가를 동작시켜야 할때, 원소별로 임의의 코드를 실행할 수 있다. 첫번째 인자로 start 혹은 end를 넘기고 콜백을 넘기면 동작을 지정할 수 있다.
 
 
 ## reference

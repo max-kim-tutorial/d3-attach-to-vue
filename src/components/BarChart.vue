@@ -20,7 +20,7 @@ export default {
     },
     height: {
       type:Number,
-      default:300
+      default:500
     },
     margin:{
       type:Object,
@@ -45,19 +45,30 @@ export default {
   },
   methods: {
     getScales() {
-      const { width, dataSet } = this
-
+      const { width, dataSet, height, margin } = this
       const xScale = d3.scaleBand()
         .domain(d3.range(dataSet.length))
         .rangeRound([0, width])
-        .padding(0)
+        .padding(1)
       const yScale = d3.scaleLinear()
         .domain([0, d3.max(dataSet)])
-        .rangeRound([0, 300])
+        .rangeRound([height-margin.bottom, margin.top])
+        .nice()
       return { xScale, yScale }
     },
+    getAxis() {
+      const { height } = this
+      const { yScale } = this.getScales()
+      const axis = g => g
+        .attr("y", (d) => height - yScale(d))
+        .attr('transform', `translate(30, 0)`)
+        .attr('class', 'yAxis')
+        .call(d3.axisLeft(yScale))
+      return axis
+    },
     drawChart() {
-      const { dataSet, width, height } = this
+      //? 데이터셋 개수가 달라졌을 경우는? => 그럴땐 append가 필요할텐데
+      const { dataSet, width, height, margin } = this
       const { xScale, yScale } = this.getScales()
 
       this.$nextTick(() => {
@@ -70,8 +81,8 @@ export default {
         .enter()
         .append('rect')
         .attr("x", (d,i) => xScale(i))
-        .attr("y", (d) => height - (d*2))
-        .attr("height", d => yScale(d))
+        .attr("y", (d) => yScale(d))
+        .attr("height", d => height - yScale(d) - margin.bottom)
         .attr("width", 40)
         .attr('fill', 'green')
 
@@ -80,31 +91,44 @@ export default {
         .enter()
         .append("text")
         .text(d => d)
+        .attr('class', 'label')
         .attr('x', (d,i) => xScale(i) + 20)
-        .attr('y', d => height - (d*2) - 10)
+        .attr('y', d => yScale(d) - 5)
         .attr('fill', 'black')
         .attr('text-anchor', 'middle')
         .attr('font-size', '12')
+
+      svg.append('g').call(this.getAxis());
       })
+      
     },
     updateChart() {
-      const { dataSet, height } = this
+      const { dataSet, height, margin } = this
       const { xScale, yScale } = this.getScales()
 
       this.$nextTick(() => {
         const svg = d3.select("#bar-chart")
         svg.selectAll('rect')
           .data(dataSet)
+          .transition()
+          .duration(1000)
           .attr("x", (d,i) => xScale(i))
-          .attr("y", (d) => height - (d*2))
-          .attr("height", d => yScale(d))
+          .attr("y", (d) => yScale(d))
+          .attr("height", d => height - yScale(d) - margin.bottom)
           .attr('fill', 'blue')
 
-        svg.selectAll("text")
+        svg.selectAll("text.label")
           .data(dataSet)
           .text(d => d)
+          .transition()
+          .duration(1000)
           .attr('x', (d,i) => xScale(i) + 20)
-          .attr('y', d => height - (d*2) - 10)
+          .attr('y', d => yScale(d) - 5)
+
+        svg.select('.yAxis')
+          .transition()
+          .duration(1000)
+          .call(this.getAxis())
       })
     }
   }
