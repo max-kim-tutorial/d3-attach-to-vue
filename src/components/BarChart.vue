@@ -1,6 +1,12 @@
 <template>
   <div class="bar-chart">
-    <section id="bar-chart" />
+    <svg id="bar-chart">
+      <g class="bar-chart__bars"></g>
+      <g class="bar-chart__axis"></g>
+      <g class="bar-chart__mark"></g>
+      <g class="bar-chart__label"></g>
+    </svg>
+    <div class="bar-chart__legend"></div>
   </div>
 </template>
 
@@ -14,9 +20,13 @@ export default {
       type: Array,
       default:() => [],
     },
+    dataColor: {
+      type: Object,
+      default: () => ({})
+    },
     width:{
       type:Number,
-      default:400
+      default:500
     },
     height: {
       type:Number,
@@ -35,101 +45,131 @@ export default {
   watch: {
     dataSet :{
       deep: true,
-      handler() {
-        this.updateChart()
+      handler(next,prev) {
+        console.log(prev, next)
+        if (prev.length === next.length) {
+          this.updateChart()
+        } else if (prev.length < next.length) {
+          this.enterChart()
+          this.updateChart()
+        } else if (prev.length > next.length) {
+          this.exitChart()
+        }
       }
     }
   },
   created() {
-    this.drawChart()
+    this.enterChart()
   },
   methods: {
     getScales() {
       const { width, dataSet, height, margin } = this
       const xScale = d3.scaleBand()
         .domain(d3.range(dataSet.length))
-        .rangeRound([0, width])
-        .padding(1)
+        .rangeRound([margin.left, width-margin.left])
       const yScale = d3.scaleLinear()
-        .domain([0, d3.max(dataSet)])
+        .domain([0, d3.max(dataSet.map(d => d.value))])
         .rangeRound([height-margin.bottom, margin.top])
         .nice()
       return { xScale, yScale }
     },
-    getAxis() {
-      const { height } = this
-      const { yScale } = this.getScales()
-      const axis = g => g
-        .attr("y", (d) => height - yScale(d))
-        .attr('transform', `translate(30, 0)`)
-        .attr('class', 'yAxis')
-        .call(d3.axisLeft(yScale))
-      return axis
-    },
-    drawChart() {
-      //? 데이터셋 개수가 달라졌을 경우는? => 그럴땐 append가 필요할텐데
+    enterChart() {
       const { dataSet, width, height, margin } = this
       const { xScale, yScale } = this.getScales()
+      const graphWidth = (width / dataSet.length) * 0.8
 
       this.$nextTick(() => {
-      const svg = d3.select("#bar-chart").append('svg')
+      const svg = d3.select("#bar-chart")
         .style('width', width)
         .style('height', height);
 
-      svg.selectAll('rect')
+      svg.select('.bar-chart__bars')
+        .selectAll('rect')
         .data(dataSet)
         .enter()
         .append('rect')
         .attr("x", (d,i) => xScale(i))
-        .attr("y", (d) => yScale(d))
-        .attr("height", d => height - yScale(d) - margin.bottom)
-        .attr("width", 40)
+        .attr("y", (d) => yScale(d.value))
+        .attr("height", d => height - yScale(d.value) - margin.bottom)
+        .attr("width", graphWidth)
         .attr('fill', 'green')
 
-      svg.selectAll("text")
+      svg.select('.bar-chart__mark')
+        .selectAll("text")
         .data(dataSet)
         .enter()
         .append("text")
-        .text(d => d)
-        .attr('class', 'label')
-        .attr('x', (d,i) => xScale(i) + 20)
-        .attr('y', d => yScale(d) - 5)
+        .text(d => d.value)
+        .attr('class', 'mark')
+        .attr('x', (d,i) => xScale(i) + (graphWidth/2))
+        .attr('y', d => yScale(d.value) - 5)
         .attr('fill', 'black')
         .attr('text-anchor', 'middle')
         .attr('font-size', '12')
 
-      svg.append('g').call(this.getAxis());
-      })
-      
+      svg.select('.bar-chart__axis')
+        .data(dataSet)
+        .attr("y", (d) => height - yScale(d.value))
+        .attr('transform', `translate(30, 0)`)
+        .attr('class', 'axis')
+        .call(d3.axisLeft(yScale))
+
+      svg.select('.bar-chart__label')
+        .selectAll("text")
+        .data(dataSet)
+        .enter()
+        .append("text")
+        .text(d => d.label)
+        .attr('class', 'label')
+        .attr('x', (d,i) => xScale(i) + (graphWidth/2))
+        .attr('y', height - 10)
+        .attr('fill', 'black')
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '12')
+      })  
     },
     updateChart() {
-      const { dataSet, height, margin } = this
+      const { dataSet, height, margin, width } = this
       const { xScale, yScale } = this.getScales()
+      const graphWidth = (width / dataSet.length) * 0.8
 
       this.$nextTick(() => {
         const svg = d3.select("#bar-chart")
+
         svg.selectAll('rect')
           .data(dataSet)
           .transition()
-          .duration(1000)
+          .duration(500)
           .attr("x", (d,i) => xScale(i))
-          .attr("y", (d) => yScale(d))
-          .attr("height", d => height - yScale(d) - margin.bottom)
+          .attr("y", (d) => yScale(d.value))
+          .attr("height", d => height - yScale(d.value) - margin.bottom)
+          .attr("width", graphWidth)
           .attr('fill', 'blue')
+
+        svg.selectAll("text.mark")
+          .data(dataSet)
+          .text(d => d.value)
+          .transition()
+          .duration(500)
+          .attr('x', (d,i) => xScale(i) + (graphWidth/2))
+          .attr('y', d => yScale(d.value) - 5)
 
         svg.selectAll("text.label")
           .data(dataSet)
-          .text(d => d)
+          .text(d => d.label)
           .transition()
-          .duration(1000)
-          .attr('x', (d,i) => xScale(i) + 20)
-          .attr('y', d => yScale(d) - 5)
+          .duration(500)
+          .attr('x', (d,i) => xScale(i) + (graphWidth/2))
+          .attr('y', height - 10)
 
-        svg.select('.yAxis')
+        svg.select('.axis')
           .transition()
           .duration(1000)
-          .call(this.getAxis())
+          .call(d3.axisLeft(yScale))
       })
+    },
+    exitChart() {
+
     }
   }
 }
