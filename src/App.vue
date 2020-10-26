@@ -2,6 +2,7 @@
   <div id="app">
     <button @click="addDataSet">add</button>
     <button @click="removeDataSet">remove</button>
+    <button @click="changeDataSet">change</button>
     <BarChart :data-set="dataSet"/>
   </div>
 </template>
@@ -39,11 +40,21 @@ export default {
     addDataSet() {
       this.dataSet = [
         ...this.dataSet,
-        {label:'전주', value:28}
+        {label:'전주', value:Math.floor(Math.random() * 25)}
       ]
     },
     removeDataSet() {
-      this.dataSet.unshift()
+      this.dataSet = this.dataSet.filter((data, index) => index !== 0)
+    },
+    changeDataSet() {
+      const dataLength = this.dataSet.length
+      this.dataSet = []
+      for(let i = 0; i < dataLength; i++) {
+        this.dataSet = [
+          ...this.dataSet, 
+          {label:`도시${i}`, value:Math.floor(Math.random() * 25)}
+        ]
+      }
     }
   }
 }

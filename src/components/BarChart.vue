@@ -53,7 +53,9 @@ export default {
           this.enterChart()
           this.updateChart()
         } else if (prev.length > next.length) {
+          console.log('삭제')
           this.exitChart()
+          this.updateChart()
         }
       }
     }
@@ -76,13 +78,23 @@ export default {
     enterChart() {
       const { dataSet, width, height, margin } = this
       const { xScale, yScale } = this.getScales()
-      const graphWidth = (width / dataSet.length) * 0.8
+      const graphWidth = (width / dataSet.length) * 0.6
 
       this.$nextTick(() => {
       const svg = d3.select("#bar-chart")
         .style('width', width)
         .style('height', height);
 
+      svg.select('.bar-chart__axis')
+        .data(dataSet)
+        .attr("y", (d) => height - yScale(d.value))
+        .attr('transform', `translate(30, 0)`)
+        .attr('class', 'axis')
+        .call(d3.axisLeft(yScale).ticks(5))
+        .selectAll('line')
+        .attr('x2', width - (margin.left + margin.right))
+        .attr('stroke', 'rgb(112, 112, 112, 0.5)')
+       
       svg.select('.bar-chart__bars')
         .selectAll('rect')
         .data(dataSet)
@@ -107,13 +119,6 @@ export default {
         .attr('text-anchor', 'middle')
         .attr('font-size', '12')
 
-      svg.select('.bar-chart__axis')
-        .data(dataSet)
-        .attr("y", (d) => height - yScale(d.value))
-        .attr('transform', `translate(30, 0)`)
-        .attr('class', 'axis')
-        .call(d3.axisLeft(yScale))
-
       svg.select('.bar-chart__label')
         .selectAll("text")
         .data(dataSet)
@@ -126,15 +131,24 @@ export default {
         .attr('fill', 'black')
         .attr('text-anchor', 'middle')
         .attr('font-size', '12')
-      })  
+      }) 
+
     },
     updateChart() {
       const { dataSet, height, margin, width } = this
       const { xScale, yScale } = this.getScales()
-      const graphWidth = (width / dataSet.length) * 0.8
+      const graphWidth = (width / dataSet.length) * 0.6
 
       this.$nextTick(() => {
         const svg = d3.select("#bar-chart")
+
+        svg.select('.axis')
+          .transition()
+          .duration(1000)
+          .call(d3.axisLeft(yScale).ticks(5))
+          .selectAll('line')
+          .attr('x2', width - (margin.left + margin.right))
+          .attr('stroke', 'rgb(112, 112, 112, 0.5)')
 
         svg.selectAll('rect')
           .data(dataSet)
@@ -161,15 +175,37 @@ export default {
           .duration(500)
           .attr('x', (d,i) => xScale(i) + (graphWidth/2))
           .attr('y', height - 10)
-
-        svg.select('.axis')
-          .transition()
-          .duration(1000)
-          .call(d3.axisLeft(yScale))
       })
     },
     exitChart() {
+      const { width, dataSet } = this
+      
+      this.$nextTick(() => {
+        const svg = d3.select("#bar-chart")
+         svg.selectAll('rect')
+          .data(dataSet)
+          .exit()
+          .transition()
+          .duration(500)
+          .attr("x", width)
+          .remove()
 
+        svg.selectAll("text.mark")
+          .data(dataSet)
+          .exit()
+          .transition()
+          .duration(500)
+          .attr("x", width)
+          .remove()
+
+        svg.selectAll("text.label")
+          .data(dataSet)
+          .exit()
+          .transition()
+          .duration(500)
+          .attr("x", width)
+          .remove()
+      })
     }
   }
 }
