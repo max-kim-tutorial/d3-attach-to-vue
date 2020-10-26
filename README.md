@@ -422,6 +422,7 @@ svg.selectAll('rect')
 
 ## reference
 
+- [Scott Murray - Interactive Data Visualization for the web, O`REILLY](https://www.oreilly.com/library/view/interactive-data-visualization/9781449340223/)
 - [44bits- 장대한 시각화도 select() 부터](https://www.44bits.io/ko/post/d3js-basic-understanding-select-and-enter-api)
 - [zziuni - d3.js API Docs 한국어 번역](https://github.com/zziuni/d3)
 - [이민호 - enter, update, exit](https://lumiamitie.github.io/d3/d3-enter-update-exit/)
