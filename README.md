@@ -397,11 +397,24 @@ svg.selectAll('rect')
 
 ## 고민
 
-- 반응형은 어캐..? 막대그래프라고 치면 svg전체 크기와 함께 좌표값도 전부 수정해야 하는걸까????? 회사에서 해보자 한번
-- template단에서 대략적인 svg틀을 잡아두고 select로는 최상위 elem을 선택하는게 더 명시적일거같다
-- 기존의 enter로 들어있는 차트 그리는 함수를 재사용할 수도 있을거 같다. watch단에서 prev랑 current 파악해서 길이가 어떻게 달라졌는지 파악하면 좋을듯?
+- 반응형은 어캐..? 막대그래프라고 치면 svg전체 크기와 함께 좌표값도 전부 수정해야 하는걸까????? 회사에서 해보자 한번 => 넘 까다로워따...
+- template단에서 대략적인 svg틀을 잡아두고 select로는 만들어놓은 elem을 선택하고 그 이하로 만드는게 더 명시적일거같다
+- 기존의 enter로 들어있는 차트 그리는 함수를 재사용할 수도 있을거 같다. watch단에서 prev랑 current 파악해서 길이가 어떻게 달라졌는지 파악하면 좋을듯? => 그렇게 해봤다
+- 이게 처음 차트를 그릴때 enter을 update상황에서 그대로 쓰기가 힘들다 => 또 다른 함수가 필요함 그래서 함수만 따지면 4개 필요함 initial, enter, update, exit... 이거보다 더 효율적인 방법 있을거 같긴 한데 지금으로선 찾기 힘들다
 - 아니면 exit update enter을 모두 나눠서 적용해도 될거같기도 => 명시적일거같다
+
+## 결론
+
+- Vue에서는 그래도 차트를 그리고 update, enter, exit시키는 로직을 재사용하기에는 쉬워 보였다.
+- 회사에서 하는 거는 데드라인이 있고 반응형까지 적용해야 하는 프로젝트이기 때문에, d3가 그렇게 적합해보이지 않는다.
+- update, exit, enter모두 일관성있게 명시적으로 선언적으로 반복되는 로직을 계속 작성해야하기 때문에 유지보수에 강점이 있지 않다.
+- 결론적으로는 가성비가 떨어진다. 매우 복잡한 차트나 데이터 시각화가 필요한 프로젝트에서는, 구현할 데이터 시각화의 복잡성이 d3의 복잡성을 상회하는 더 큰 프로젝트에서는 쓸만하겠지만, 막대 그래프, 꺾은선 그래프 정도만 필요한 프로젝트에서는 d3를 감싼, Vue와의 호환성이 더 좋은 라이브러리를 쓰는 것이 옳을 것이라 생각한다.
+- 그래두.. d3를 배워보면서 필요할때 Vue 데이터 시각화 라이브러리들의 디테일한 커스텀을 할 수 있을 것이고, 실무에서 쓰면서 대충만 알고 있었던 SVG에 대해 좀더 깊게 탐구해볼 수 있었다. 이제 라이브러리 찾아야지
+- React로 데이터 시각화 프로젝트 할때 시간이 없어서 포기했던 d3를 다시 볼수 있어서 좋았다..
 
 ## reference
 
-- https://www.44bits.io/ko/post/d3js-basic-understanding-select-and-enter-api
+- [44bits- 장대한 시각화도 select() 부터](https://www.44bits.io/ko/post/d3js-basic-understanding-select-and-enter-api)
+- [zziuni - d3.js API Docs 한국어 번역](https://github.com/zziuni/d3)
+- [이민호 - enter, update, exit](https://lumiamitie.github.io/d3/d3-enter-update-exit/)
+- [HAMA - d3 Tansition으로 작업하기](https://hamait.tistory.com/338)

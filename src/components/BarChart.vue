@@ -1,8 +1,8 @@
 <template>
   <div class="bar-chart">
     <svg id="bar-chart">
-      <g class="bar-chart__bars"></g>
       <g class="bar-chart__axis"></g>
+      <g class="bar-chart__bars"></g>
       <g class="bar-chart__mark"></g>
       <g class="bar-chart__label"></g>
     </svg>
@@ -53,7 +53,6 @@ export default {
           this.enterChart()
           this.updateChart()
         } else if (prev.length > next.length) {
-          console.log('삭제')
           this.exitChart()
           this.updateChart()
         }
